@@ -8,5 +8,8 @@
   "main": "main.js",
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^33.2.1"
+  }
 }
