@@ -1,8 +1,10 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
+const sqlite3 = require('sqlite3').verbose();
 
 let mainWindow;
+let db;
 
-app.on('ready', () => {
+function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
@@ -12,9 +14,43 @@ app.on('ready', () => {
     });
 
     mainWindow.loadFile('index.html');
+}
 
-    mainWindow.on('closed', () => {
-        mainWindow = null;
+function initDatabase() {
+    db = new sqlite3.Database('plants.db', (err) => {
+        if (err) console.error('Database error:', err);
+    });
+
+    db.run(`CREATE TABLE IF NOT EXISTS plants (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        species TEXT,
+        notes TEXT
+    )`);
+}
+
+app.whenReady().then(() => {
+    createWindow();
+    initDatabase();
+});
+
+ipcMain.handle('add-plant', async (event, plant) => {
+    return new Promise((resolve, reject) => {
+        db.run(`INSERT INTO plants (name, species, notes) VALUES (?, ?, ?)`,
+            [plant.name, plant.species, plant.notes],
+            function(err) {
+                if (err) reject(err);
+                resolve(this.lastID);
+            });
+    });
+});
+
+ipcMain.handle('get-plants', async () => {
+    return new Promise((resolve, reject) => {
+        db.all('SELECT * FROM plants', [], (err, rows) => {
+            if (err) reject(err);
+            resolve(rows);
+        });
     });
 });
 
