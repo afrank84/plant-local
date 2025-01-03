@@ -25,7 +25,7 @@ function initDatabase() {
     db.run(`CREATE TABLE IF NOT EXISTS plants (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        species TEXT,
+        variety TEXT,
         notes TEXT
     )`);
 }
@@ -38,8 +38,8 @@ app.whenReady().then(() => {
 
 ipcMain.handle('add-plant', async (event, plant) => {
   return new Promise((resolve, reject) => {
-      db.run(`INSERT INTO plants (name, species, notes) VALUES (?, ?, ?)`,
-          [plant.name, plant.species, plant.notes],
+      db.run(`INSERT INTO plants (name, variety, notes) VALUES (?, ?, ?)`,
+          [plant.name, plant.variety, plant.notes],
           function(err) {
               if (err) {
                   console.error('Database insert error:', err);

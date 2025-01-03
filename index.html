@@ -92,8 +92,8 @@
               <input id="name" class="form-control" placeholder="Plant Name">
           </div>
           <div class="mb-3">
-              <label for="species" class="form-label">Species</label>
-              <input id="species" class="form-control" placeholder="Species">
+              <label for="variety" class="form-label">Variety</label>
+              <input id="variety" class="form-control" placeholder="Variety">
           </div>
           <div class="mb-3">
               <label for="notes" class="form-label">Notes</label>
@@ -147,15 +147,15 @@
 
       async function addPlant() {
           const name = document.getElementById('name').value.trim();
-          const species = document.getElementById('species').value.trim();
+          const variety = document.getElementById('variety').value.trim();
           const notes = document.getElementById('notes').value.trim();
 
-          if (!name || !species) {
-              alert('Plant name and species are required!');
+          if (!name || !variety) {
+              alert('Plant name and variety are required!');
               return;
           }
 
-          const plant = { name, species, notes };
+          const plant = { name, variety, notes };
           try {
               await ipcRenderer.invoke('add-plant', plant);
               loadPlants();
@@ -188,7 +188,7 @@
                               <h5 class="card-title">
                                   <a href="plant_detail.html?id=${plant.id}" class="text-decoration-none">${plant.name}</a>
                               </h5>
-                              <p class="card-text"><strong>Species:</strong> ${plant.species}</p>
+                              <p class="card-text"><strong>Variety:</strong> ${plant.variety}</p>
                               <p class="card-text"><strong>Notes:</strong> ${plant.notes}</p>
                               <button class="btn btn-danger w-100 mt-2" onclick="deletePlant(${plant.id})">Delete</button>
                           </div>
@@ -200,7 +200,7 @@
 
       function clearForm() {
           document.getElementById('name').value = '';
-          document.getElementById('species').value = '';
+          document.getElementById('variety').value = '';
           document.getElementById('notes').value = '';
       }
 
