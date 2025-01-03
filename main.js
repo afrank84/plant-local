@@ -49,6 +49,19 @@ ipcMain.handle('add-plant', async (event, plant) => {
   });
 });
 
+ipcMain.handle('delete-plant', async (event, id) => {
+  return new Promise((resolve, reject) => {
+      db.run('DELETE FROM plants WHERE id = ?', [id], function(err) {
+          if (err) {
+              console.error('Database delete error:', err);
+              reject(err);
+          }
+          resolve();
+      });
+  });
+});
+
+
 ipcMain.handle('get-plants', async () => {
     return new Promise((resolve, reject) => {
         db.all('SELECT * FROM plants', [], (err, rows) => {
