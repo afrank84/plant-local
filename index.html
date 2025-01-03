@@ -151,7 +151,9 @@
                     <div class="col-12 col-md-6 col-lg-4">
                         <div class="card mb-3 shadow-sm">
                             <div class="card-body">
-                                <h5 class="card-title">${plant.name}</h5>
+                                <h5 class="card-title">
+                                    <a href="plant_detail.html?id=${plant.id}" class="text-decoration-none">${plant.name}</a>
+                                </h5>
                                 <p class="card-text"><strong>Species:</strong> ${plant.species}</p>
                                 <p class="card-text"><strong>Notes:</strong> ${plant.notes}</p>
                                 <button class="btn btn-danger w-100 mt-2" onclick="deletePlant(${plant.id})">Delete</button>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Details</title>
+</head>
+<body>
+    <div class="container my-5">
+        <h1 id="plantName">Plant Name</h1>
+        <p id="plantSpecies"></p>
+        <p id="plantNotes"></p>
+        <a href="index.html" class="btn btn-primary">Back to Plant List</a>
+    </div>
+    <script>
+        const { ipcRenderer } = require('electron');
+        const urlParams = new URLSearchParams(window.location.search);
+        const plantId = urlParams.get('id');
+
+        async function loadPlantDetails() {
+            const plant = await ipcRenderer.invoke('get-plant-by-id', plantId);
+            document.getElementById('plantName').textContent = plant.name;
+            document.getElementById('plantSpecies').textContent = `Species: ${plant.species}`;
+            document.getElementById('plantNotes').textContent = `Notes: ${plant.notes}`;
+        }
+
+        loadPlantDetails();
+    </script>
+</body>
+</html>

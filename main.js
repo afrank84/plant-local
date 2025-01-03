@@ -71,6 +71,16 @@ ipcMain.handle('get-plants', async () => {
     });
 });
 
+//Used for grabing details for loading a new page on click
+ipcMain.handle('get-plant-by-id', async (event, id) => {
+  return new Promise((resolve, reject) => {
+      db.get('SELECT * FROM plants WHERE id = ?', [id], (err, row) => {
+          if (err) reject(err);
+          resolve(row);
+      });
+  });
+});
+
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();
