@@ -55,122 +55,157 @@
         .toggle-container[data-theme="dark"] .toggle-slider {
             transform: translateX(50px);
         }
+                /* Default grid view */
+        .grid-view .col-12.col-md-6.col-lg-4 {
+            display: block;
+        }
+
+        /* List view styling */
+        .list-view .col-12.col-md-6.col-lg-4 {
+            flex: 1 1 100%;
+        }
+
 
     </style>
 </head>
 <body>
-    <div class="container my-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="text-center">Plant Records</h1>
-            <div id="themeToggle" class="toggle-container d-flex align-items-center" title="Toggle Dark Mode">
-              <span class="me-2" aria-hidden="true">☀️</span> <!-- Sun Icon -->
-              <div class="toggle-slider"></div>
-              <span class="ms-2" aria-hidden="true">🌙</span> <!-- Moon Icon -->
-            </div>
-        </div>
-        <div class="plant-form card p-4 shadow-sm">
-            <h2 class="text-center mb-4">Add Plant</h2>
-            <div class="mb-3">
-                <label for="name" class="form-label">Plant Name</label>
-                <input id="name" class="form-control" placeholder="Plant Name">
-            </div>
-            <div class="mb-3">
-                <label for="species" class="form-label">Species</label>
-                <input id="species" class="form-control" placeholder="Species">
-            </div>
-            <div class="mb-3">
-                <label for="notes" class="form-label">Notes</label>
-                <textarea id="notes" class="form-control" placeholder="Notes" rows="3"></textarea>
-            </div>
-            <button class="btn btn-primary w-100" onclick="addPlant()">Add Plant</button>
-        </div>
-        <div class="plant-list mt-5">
-            <h2 class="text-center">My Plants</h2>
-            <div id="plantList" class="row mt-4"></div>
-        </div>
-    </div>
+  <div class="container my-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+          <h1 class="text-center">Plant Records</h1>
+          <div class="d-flex align-items-center">
+              <!-- View Toggle Button -->
+              <button id="toggleView" class="btn btn-secondary me-3">Switch to List View</button>
+              <!-- Theme Toggle -->
+              <div id="themeToggle" class="toggle-container d-flex align-items-center" title="Toggle Dark Mode">
+                  <span class="me-2" aria-hidden="true">☀️</span> <!-- Sun Icon -->
+                  <div class="toggle-slider"></div>
+                  <span class="ms-2" aria-hidden="true">🌙</span> <!-- Moon Icon -->
+              </div>
+          </div>
+      </div>
 
-    <script>
-        const { ipcRenderer } = require('electron');
+      <!-- Form for Adding Plants -->
+      <div class="plant-form card p-4 shadow-sm">
+          <h2 class="text-center mb-4">Add Plant</h2>
+          <div class="mb-3">
+              <label for="name" class="form-label">Plant Name</label>
+              <input id="name" class="form-control" placeholder="Plant Name">
+          </div>
+          <div class="mb-3">
+              <label for="species" class="form-label">Species</label>
+              <input id="species" class="form-control" placeholder="Species">
+          </div>
+          <div class="mb-3">
+              <label for="notes" class="form-label">Notes</label>
+              <textarea id="notes" class="form-control" placeholder="Notes" rows="3"></textarea>
+          </div>
+          <button class="btn btn-primary w-100" onclick="addPlant()">Add Plant</button>
+      </div>
 
-        const themeToggle = document.getElementById('themeToggle');
-        
-        // Toggle theme function
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            themeToggle.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
+      <!-- Plant List with Grid/List Toggle -->
+      <div class="plant-list mt-5">
+          <h2 class="text-center">My Plants</h2>
+          <div id="plantList" class="row grid-view mt-4"></div>
+      </div>
+  </div>
 
-        // Initialize theme on load
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'dark'; // Default to dark
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            themeToggle.setAttribute('data-theme', savedTheme);
-        });
+  <script>
+      const { ipcRenderer } = require('electron');
 
-        async function addPlant() {
-            const name = document.getElementById('name').value.trim();
-            const species = document.getElementById('species').value.trim();
-            const notes = document.getElementById('notes').value.trim();
+      const themeToggle = document.getElementById('themeToggle');
+      const toggleViewButton = document.getElementById('toggleView');
+      const plantList = document.getElementById('plantList');
 
-            if (!name || !species) {
-                alert('Plant name and species are required!');
-                return;
-            }
+      // Toggle theme function
+      themeToggle.addEventListener('click', () => {
+          const currentTheme = document.documentElement.getAttribute('data-theme');
+          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', newTheme);
+          themeToggle.setAttribute('data-theme', newTheme);
+          localStorage.setItem('theme', newTheme);
+      });
 
-            const plant = { name, species, notes };
-            try {
-                await ipcRenderer.invoke('add-plant', plant);
-                loadPlants();
-                clearForm();
-            } catch (error) {
-                console.error('Error adding plant:', error);
-            }
-        }
+      // Toggle view function
+      toggleViewButton.addEventListener('click', () => {
+          if (plantList.classList.contains('grid-view')) {
+              plantList.classList.remove('grid-view');
+              plantList.classList.add('list-view');
+              toggleViewButton.textContent = 'Switch to Grid View';
+          } else {
+              plantList.classList.remove('list-view');
+              plantList.classList.add('grid-view');
+              toggleViewButton.textContent = 'Switch to List View';
+          }
+      });
 
-        async function deletePlant(id) {
-            if (confirm('Are you sure you want to delete this plant?')) {
-                try {
-                    await ipcRenderer.invoke('delete-plant', id);
-                    loadPlants();
-                } catch (error) {
-                    console.error('Error deleting plant:', error);
-                }
-            }
-        }
+      // Initialize theme on load
+      document.addEventListener('DOMContentLoaded', () => {
+          const savedTheme = localStorage.getItem('theme') || 'dark'; // Default to dark
+          document.documentElement.setAttribute('data-theme', savedTheme);
+          themeToggle.setAttribute('data-theme', savedTheme);
+      });
 
-        async function loadPlants() {
-            const plants = await ipcRenderer.invoke('get-plants');
-            const list = document.getElementById('plantList');
-            list.innerHTML = '';
-            plants.forEach(plant => {
-                list.innerHTML += `
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="card mb-3 shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    <a href="plant_detail.html?id=${plant.id}" class="text-decoration-none">${plant.name}</a>
-                                </h5>
-                                <p class="card-text"><strong>Species:</strong> ${plant.species}</p>
-                                <p class="card-text"><strong>Notes:</strong> ${plant.notes}</p>
-                                <button class="btn btn-danger w-100 mt-2" onclick="deletePlant(${plant.id})">Delete</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
+      async function addPlant() {
+          const name = document.getElementById('name').value.trim();
+          const species = document.getElementById('species').value.trim();
+          const notes = document.getElementById('notes').value.trim();
 
-        function clearForm() {
-            document.getElementById('name').value = '';
-            document.getElementById('species').value = '';
-            document.getElementById('notes').value = '';
-        }
+          if (!name || !species) {
+              alert('Plant name and species are required!');
+              return;
+          }
 
-        loadPlants();
-    </script>
+          const plant = { name, species, notes };
+          try {
+              await ipcRenderer.invoke('add-plant', plant);
+              loadPlants();
+              clearForm();
+          } catch (error) {
+              console.error('Error adding plant:', error);
+          }
+      }
+
+      async function deletePlant(id) {
+          if (confirm('Are you sure you want to delete this plant?')) {
+              try {
+                  await ipcRenderer.invoke('delete-plant', id);
+                  loadPlants();
+              } catch (error) {
+                  console.error('Error deleting plant:', error);
+              }
+          }
+      }
+
+      async function loadPlants() {
+          const plants = await ipcRenderer.invoke('get-plants');
+          const list = document.getElementById('plantList');
+          list.innerHTML = '';
+          plants.forEach(plant => {
+              list.innerHTML += `
+                  <div class="col-12 col-md-6 col-lg-4">
+                      <div class="card mb-3 shadow-sm">
+                          <div class="card-body">
+                              <h5 class="card-title">
+                                  <a href="plant_detail.html?id=${plant.id}" class="text-decoration-none">${plant.name}</a>
+                              </h5>
+                              <p class="card-text"><strong>Species:</strong> ${plant.species}</p>
+                              <p class="card-text"><strong>Notes:</strong> ${plant.notes}</p>
+                              <button class="btn btn-danger w-100 mt-2" onclick="deletePlant(${plant.id})">Delete</button>
+                          </div>
+                      </div>
+                  </div>
+              `;
+          });
+      }
+
+      function clearForm() {
+          document.getElementById('name').value = '';
+          document.getElementById('species').value = '';
+          document.getElementById('notes').value = '';
+      }
+
+      loadPlants();
+  </script>
+
 </body>
 </html>

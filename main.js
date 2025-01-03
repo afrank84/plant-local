@@ -35,6 +35,7 @@ app.whenReady().then(() => {
     initDatabase();
 });
 
+
 ipcMain.handle('add-plant', async (event, plant) => {
   return new Promise((resolve, reject) => {
       db.run(`INSERT INTO plants (name, species, notes) VALUES (?, ?, ?)`,
