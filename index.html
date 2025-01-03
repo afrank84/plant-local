@@ -25,15 +25,25 @@
         const { ipcRenderer } = require('electron');
 
         async function addPlant() {
-            const plant = {
-                name: document.getElementById('name').value,
-                species: document.getElementById('species').value,
-                notes: document.getElementById('notes').value
-            };
-            await ipcRenderer.invoke('add-plant', plant);
-            loadPlants();
-            clearForm();
+            const name = document.getElementById('name').value.trim();
+            const species = document.getElementById('species').value.trim();
+            const notes = document.getElementById('notes').value.trim();
+
+            if (!name || !species) {
+                alert('Plant name and species are required!');
+                return;
+            }
+
+            const plant = { name, species, notes };
+            try {
+                await ipcRenderer.invoke('add-plant', plant);
+                loadPlants();
+                clearForm();
+            } catch (error) {
+                console.error('Error adding plant:', error);
+            }
         }
+
 
         async function loadPlants() {
             const plants = await ipcRenderer.invoke('get-plants');

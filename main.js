@@ -9,7 +9,8 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            contextIsolation: false, // Ensure it's consistent with your HTML expectations
         }
     });
 
@@ -35,14 +36,17 @@ app.whenReady().then(() => {
 });
 
 ipcMain.handle('add-plant', async (event, plant) => {
-    return new Promise((resolve, reject) => {
-        db.run(`INSERT INTO plants (name, species, notes) VALUES (?, ?, ?)`,
-            [plant.name, plant.species, plant.notes],
-            function(err) {
-                if (err) reject(err);
-                resolve(this.lastID);
-            });
-    });
+  return new Promise((resolve, reject) => {
+      db.run(`INSERT INTO plants (name, species, notes) VALUES (?, ?, ?)`,
+          [plant.name, plant.species, plant.notes],
+          function(err) {
+              if (err) {
+                  console.error('Database insert error:', err);
+                  reject(err);
+              }
+              resolve(this.lastID);
+          });
+  });
 });
 
 ipcMain.handle('get-plants', async () => {
