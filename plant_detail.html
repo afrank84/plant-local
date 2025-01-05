@@ -4,14 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plant Details</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .image-box {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+        }
+        .image-box img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .image-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            text-align: center;
+            padding: 5px;
+        }
+        .month-cell {
+            width: 8.33%;
+            text-align: center;
+            font-weight: bold;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container my-5">
+    <div class="container mt-5">
         <h1 id="plantName">Plant Name</h1>
-        <p id="plantVariety"></p>
-        <p id="plantNotes"></p>
+        <h2 id="plantVariety">Variety</h2>
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="image-box">
+                    <img src="https://placehold.co/300" alt="Seed Image" id="seedImage">
+                    <div class="image-label">Seed</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="image-box">
+                    <img src="https://placehold.co/300" alt="Plant Image" id="plantImage">
+                    <div class="image-label">Plant</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="image-box">
+                    <img src="https://placehold.co/300" alt="Flower Image" id="flowerImage">
+                    <div class="image-label">Flower</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="image-box">
+                    <img src="https://placehold.co/300" alt="Fruit Image" id="fruitImage">
+                    <div class="image-label">Fruit</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <h3>Notes</h3>
+            <p id="plantNotes"></p>
+        </div>
         <a href="index.html" class="btn btn-primary">Back to Plant List</a>
     </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="text-muted text-center">&copy; 2024 Plant-a-base. All rights reserved.</p>
+        </div>
+    </footer>
     <script>
         const { ipcRenderer } = require('electron');
         const urlParams = new URLSearchParams(window.location.search);
@@ -22,9 +93,14 @@
             document.getElementById('plantName').textContent = plant.name;
             document.getElementById('plantVariety').textContent = `Variety: ${plant.variety}`;
             document.getElementById('plantNotes').textContent = `Notes: ${plant.notes}`;
+            document.getElementById('seedImage').src = plant.images.seed || 'https://placehold.co/300';
+            document.getElementById('plantImage').src = plant.images.plant || 'https://placehold.co/300';
+            document.getElementById('flowerImage').src = plant.images.flower || 'https://placehold.co/300';
+            document.getElementById('fruitImage').src = plant.images.fruit || 'https://placehold.co/300';
         }
 
         loadPlantDetails();
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
