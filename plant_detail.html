@@ -44,6 +44,8 @@
     <div class="container mt-5">
         <h1 id="plantName">Plant Name</h1>
         <h2 id="plantVariety">Variety</h2>
+
+        <!-- Image Section -->
         <div class="row mb-4">
             <div class="col-md-3 mb-3">
                 <div class="image-box">
@@ -71,10 +73,72 @@
             </div>
         </div>
 
-        <div class="mb-4">
-            <h3>Notes</h3>
-            <p id="plantNotes"></p>
+        <!-- Plant Description Section -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <img src="https://placehold.co/500x300" alt="Plant Description Image" class="img-fluid" id="descriptionImage">
+            </div>
+            <div class="col-md-6">
+                <h3>Plant Description</h3>
+                <p id="plantDescription">This is a detailed description of the plant. It includes information about its appearance, growth habits, and any unique characteristics. The description helps gardeners and plant enthusiasts understand the plant's needs and what to expect as it grows.</p>
+            </div>
         </div>
+
+        <!-- Monthly Growing Season Table -->
+        <table class="table table-bordered mb-4">
+            <thead>
+                <tr>
+                    <th scope="col" class="month-cell">Jan</th>
+                    <th scope="col" class="month-cell">Feb</th>
+                    <th scope="col" class="month-cell">Mar</th>
+                    <th scope="col" class="month-cell">Apr</th>
+                    <th scope="col" class="month-cell">May</th>
+                    <th scope="col" class="month-cell">Jun</th>
+                    <th scope="col" class="month-cell">Jul</th>
+                    <th scope="col" class="month-cell">Aug</th>
+                    <th scope="col" class="month-cell">Sep</th>
+                    <th scope="col" class="month-cell">Oct</th>
+                    <th scope="col" class="month-cell">Nov</th>
+                    <th scope="col" class="month-cell">Dec</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="growingSeasonRow"></tr>
+            </tbody>
+        </table>
+
+        <!-- Plant Details Table -->
+        <table class="table table-bordered mb-4">
+            <thead>
+                <tr>
+                    <th scope="col">Description</th>
+                    <th scope="col">Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">DTG (Days to Germination)</th>
+                    <td id="dtg">7-14 days</td>
+                </tr>
+                <tr>
+                    <th scope="row">DTH (Days to Harvest)</th>
+                    <td id="dth">60-80 days</td>
+                </tr>
+                <tr>
+                    <th scope="row">Zone</th>
+                    <td id="zone">4-9</td>
+                </tr>
+                <tr>
+                    <th scope="row">Sow Depth</th>
+                    <td id="sowDepth">1/4 inch</td>
+                </tr>
+                <tr>
+                    <th scope="row">Seed Spacing</th>
+                    <td id="seedSpacing">6-12 inches</td>
+                </tr>
+            </tbody>
+        </table>
+
         <a href="index.html" class="btn btn-primary">Back to Plant List</a>
     </div>
 
@@ -83,6 +147,7 @@
             <p class="text-muted text-center">&copy; 2024 Plant-a-base. All rights reserved.</p>
         </div>
     </footer>
+
     <script>
         const { ipcRenderer } = require('electron');
         const urlParams = new URLSearchParams(window.location.search);
@@ -97,6 +162,10 @@
             document.getElementById('plantImage').src = plant.images.plant || 'https://placehold.co/300';
             document.getElementById('flowerImage').src = plant.images.flower || 'https://placehold.co/300';
             document.getElementById('fruitImage').src = plant.images.fruit || 'https://placehold.co/300';
+            document.getElementById('descriptionImage').src = plant.images.description || 'https://placehold.co/500x300';
+            document.getElementById('plantDescription').textContent = plant.description || 'No description available.';
+            const growingSeasonRow = document.getElementById('growingSeasonRow');
+            growingSeasonRow.innerHTML = plant.growingSeason.map(month => `<td class="${month.active ? 'bg-success' : ''}"></td>`).join('');
         }
 
         loadPlantDetails();
