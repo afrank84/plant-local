@@ -43,6 +43,12 @@
           <button class="btn btn-primary w-100" onclick="addPlant()">Add Plant</button>
       </div>
 
+      <!-- Search Bar -->
+      <div class="mb-4 search-bar-container">
+        <h3>Search</h3>
+        <input type="text" id="searchBar" class="form-control" placeholder="Search for plants...">
+      </div>
+
       <!-- Plant List with Grid/List Toggle -->
       <div class="plant-list mt-5">
           <h2 class="text-center">My Plants</h2>
@@ -138,6 +144,23 @@
               `;
           });
       }
+
+      document.getElementById('searchBar').addEventListener('input', function (e) {
+          const searchTerm = e.target.value.toLowerCase();
+          const plantCards = document.querySelectorAll('#plantList .card');
+
+          plantCards.forEach(card => {
+              const name = card.querySelector('.card-title a').textContent.toLowerCase();
+              const variety = card.querySelector('.card-text').textContent.toLowerCase();
+              
+              if (name.includes(searchTerm) || variety.includes(searchTerm)) {
+                  card.parentElement.style.display = 'block';
+              } else {
+                  card.parentElement.style.display = 'none';
+              }
+          });
+      });
+
 
       function clearForm() {
           document.getElementById('name').value = '';
