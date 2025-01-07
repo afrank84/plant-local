@@ -1,0 +1,97 @@
+/* General Theme Variables */
+:root {
+    --bs-body-bg: #f8f9fa;
+    --bs-body-color: #212529;
+}
+[data-theme="dark"] {
+    --bs-body-bg: #212529;
+    --bs-body-color: #f8f9fa;
+}
+
+/* Body Styling */
+body {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+/* Card Styling */
+.card {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-body-color);
+}
+
+/* Toggle Container Styling */
+.toggle-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 80px;
+    height: 25px;
+    background-color: #ccc;
+    border-radius: 25px;
+    padding: 0 5px;
+    cursor: pointer;
+}
+.toggle-container[data-theme="dark"] {
+    background-color: #4caf50;
+}
+.toggle-slider {
+    position: absolute;
+    width: 23px;
+    height: 23px;
+    background-color: #fff;
+    border-radius: 50%;
+    top: 1px;
+    left: 2px;
+    transition: transform 0.3s ease;
+}
+.toggle-container[data-theme="dark"] .toggle-slider {
+    transform: translateX(50px);
+}
+
+/* Grid and List View */
+.grid-view .col-12.col-md-6.col-lg-4 {
+    display: block;
+}
+.list-view .col-12.col-md-6.col-lg-4 {
+    flex: 1 1 100%;
+}
+
+/* Image Box Styling */
+.image-box {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+}
+.image-box img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.image-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    text-align: center;
+    padding: 5px;
+}
+
+/* Month Cell Styling */
+.month-cell {
+    width: 8.33%;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Footer Styling */
+.footer {
+    background-color: #f8f9fa;
+    padding: 20px 0;
+    margin-top: 40px;
+}
