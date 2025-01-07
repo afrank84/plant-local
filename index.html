@@ -28,20 +28,50 @@
       <!-- Form for Adding Plants -->
       <div class="plant-form card p-4 shadow-sm">
           <h2 class="text-center mb-4">Add Plant</h2>
+          <!-- Plant Name -->
           <div class="mb-3">
               <label for="name" class="form-label">Plant Name</label>
               <input id="name" class="form-control" placeholder="Plant Name">
           </div>
+          <!-- Variety -->
           <div class="mb-3">
               <label for="variety" class="form-label">Variety</label>
               <input id="variety" class="form-control" placeholder="Variety">
           </div>
+          <!-- Notes -->
           <div class="mb-3">
               <label for="notes" class="form-label">Notes</label>
               <textarea id="notes" class="form-control" placeholder="Notes" rows="3"></textarea>
           </div>
+          <!-- Seed Image -->
+          <div class="mb-3">
+              <label for="img_seed_upload" class="form-label">Upload Seed Image</label>
+              <input type="file" id="img_seed_upload" class="form-control">
+          </div>
+          <!-- Plant Image -->
+          <div class="mb-3">
+              <label for="img_plant_upload" class="form-label">Upload Plant Image</label>
+              <input type="file" id="img_plant_upload" class="form-control">
+          </div>
+          <!-- Flower Image -->
+          <div class="mb-3">
+              <label for="img_flower_upload" class="form-label">Upload Flower Image</label>
+              <input type="file" id="img_flower_upload" class="form-control">
+          </div>
+          <!-- Fruit Image -->
+          <div class="mb-3">
+              <label for="img_fruit_upload" class="form-label">Upload Fruit Image</label>
+              <input type="file" id="img_fruit_upload" class="form-control">
+          </div>
+          <!-- Description Image -->
+          <div class="mb-3">
+              <label for="img_description_upload" class="form-label">Upload Description Image</label>
+              <input type="file" id="img_description_upload" class="form-control">
+          </div>
+          <!-- Submit Button -->
           <button class="btn btn-primary w-100" onclick="addPlant()">Add Plant</button>
       </div>
+    
 
       <!-- Search Bar -->
       <div class="mb-4 search-bar-container">
@@ -102,15 +132,61 @@
               return;
           }
 
-          const plant = { name, variety, notes };
           try {
-              await ipcRenderer.invoke('add-plant', plant);
+              // Save plant first to get the ID
+              const plantId = await ipcRenderer.invoke('add-plant', { name, variety, notes });
+
+              // Upload images using the plant ID
+              const imgSeed = await uploadImage(plantId, 'img_seed_upload');
+              const imgPlant = await uploadImage(plantId, 'img_plant_upload');
+              const imgFlower = await uploadImage(plantId, 'img_flower_upload');
+              const imgFruit = await uploadImage(plantId, 'img_fruit_upload');
+              const imgDescription = await uploadImage(plantId, 'img_description_upload');
+
+              // Update the plant record with the image paths
+              await ipcRenderer.invoke('update-plant-images', {
+                  plantId,
+                  imgSeed,
+                  imgPlant,
+                  imgFlower,
+                  imgFruit,
+                  imgDescription,
+              });
+
+              alert('Plant added successfully!');
               loadPlants();
               clearForm();
-          } catch (error) {
-              console.error('Error adding plant:', error);
+          } catch (err) {
+              console.error('Error adding plant:', err);
+              alert('Failed to add plant.');
           }
       }
+
+      async function uploadImage(plantId, fileInputId) {
+          const fileInput = document.getElementById(fileInputId);
+          if (!fileInput || fileInput.files.length === 0) {
+              console.error(`No file selected for input: ${fileInputId}`);
+              return null;
+          }
+
+          const file = fileInput.files[0];
+          console.log('Selected file:', file);
+
+          // Use Electron's file path handling if available
+          if (!file.path) {
+              console.error('File path is undefined. Ensure nodeIntegration is enabled.');
+              return null;
+          }
+
+          const filePath = await ipcRenderer.invoke('upload-image', {
+              plantId,
+              filePath: file.path,
+          });
+
+          return filePath; // Save this path in the database
+      }
+
+
 
       async function deletePlant(id) {
           if (confirm('Are you sure you want to delete this plant?')) {

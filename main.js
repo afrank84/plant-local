@@ -1,5 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+const fs = require('fs');
 
 let mainWindow;
 let db;
@@ -72,6 +74,51 @@ ipcMain.handle('add-plant', async (event, plant) => {
           });
   });
 });
+
+ipcMain.handle('upload-image', async (event, { plantId, filePath }) => {
+    if (!filePath) {
+        throw new TypeError('Invalid file path provided.');
+    }
+
+    try {
+        const extension = path.extname(filePath); // Get the file extension
+        const saveDir = path.join(__dirname, 'uploads'); // Directory to save images
+        if (!fs.existsSync(saveDir)) {
+            fs.mkdirSync(saveDir); // Create directory if it doesn't exist
+        }
+        const savePath = path.join(saveDir, `${plantId}_${path.basename(filePath)}`); // Name file with plantId
+        fs.copyFileSync(filePath, savePath); // Save the file
+        return savePath; // Return the saved file path
+    } catch (error) {
+        console.error('Error occurred in upload-image handler:', error);
+        throw error;
+    }
+});
+
+
+
+ipcMain.handle('update-plant-images', async (event, { plantId, imgSeed, imgPlant, imgFlower, imgFruit, imgDescription }) => {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE plants SET 
+                img_seed_filename = ?, 
+                img_plant_filename = ?, 
+                img_flower_filename = ?, 
+                img_fruit_filename = ?, 
+                img_description_filename = ? 
+            WHERE id = ?`,
+            [imgSeed, imgPlant, imgFlower, imgFruit, imgDescription, plantId],
+            (err) => {
+                if (err) {
+                    console.error('Error updating plant images:', err);
+                    reject(err);
+                }
+                resolve();
+            }
+        );
+    });
+});
+
 
 ipcMain.handle('delete-plant', async (event, id) => {
   return new Promise((resolve, reject) => {
