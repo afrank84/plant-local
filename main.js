@@ -18,8 +18,10 @@ function createWindow() {
 }
 
 function initDatabase() {
-    db = new sqlite3.Database('plants.db', (err) => {
-        if (err) console.error('Database error:', err);
+    db = new sqlite3.Database('plants.db', (err) => { // Notice no "const" here
+        if (err) {
+            console.error('Database error:', err);
+        }
     });
 
     db.run(`CREATE TABLE IF NOT EXISTS plants (
@@ -28,7 +30,28 @@ function initDatabase() {
         variety TEXT,
         notes TEXT
     )`);
+
+    const newColumns = [
+        { name: 'img_seed_filename', type: 'TEXT' },
+        { name: 'img_plant_filename', type: 'TEXT' },
+        { name: 'img_flower_filename', type: 'TEXT' },
+        { name: 'img_fruit_filename', type: 'TEXT' },
+        { name: 'img_description_filename', type: 'TEXT' },
+        { name: 'description', type: 'TEXT' }
+    ];
+
+    newColumns.forEach((column) => {
+        db.run(`ALTER TABLE plants ADD COLUMN ${column.name} ${column.type}`, (err) => {
+            if (err && !err.message.includes("duplicate column name")) {
+                console.error(`Error adding column ${column.name}:`, err);
+            }
+        });
+    });
+
+    console.log('Database initialized');
 }
+
+
 
 app.whenReady().then(() => {
     createWindow();
@@ -64,6 +87,9 @@ ipcMain.handle('delete-plant', async (event, id) => {
 
 
 ipcMain.handle('get-plants', async () => {
+    if (!db) {
+        throw new Error('Database is not initialized');
+    }
     return new Promise((resolve, reject) => {
         db.all('SELECT * FROM plants', [], (err, rows) => {
             if (err) reject(err);
@@ -71,6 +97,7 @@ ipcMain.handle('get-plants', async () => {
         });
     });
 });
+
 
 //Used for grabing details for loading a new page on click
 ipcMain.handle('get-plant-by-id', async (event, id) => {
